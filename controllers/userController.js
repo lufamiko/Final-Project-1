@@ -12,7 +12,7 @@ class userController {
             const existisngUser = await db.query("SELECT * FROM Users WHERE email = $1", [req.body.email])
             if (existisngUser.rowCount > 0) {
                 throw {
-                    code: 401,
+                    code: 400,
                     message: "Email already used!"
                 }
             }

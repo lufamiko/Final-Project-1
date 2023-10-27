@@ -45,12 +45,17 @@ class reflectionController {
     }
 
     static async updateReflection(req, res) {
+        const dataId = req.params.id
+        const userdata = req.UserData
         try {
-            const { id } = req.params;
-            const userData = req.UserData;
-            const { success, low_point, take_away } = req.body
-            const data = await db.query("UPDATE Reflections SET success = $1, low_point = $2, take_away = $3 WHERE id = $4 AND userid = $5 RETURNING *", [req.body.success, req.body.low_point, req.body.take_away, id, userData.id])
-            res.status(201).json(data.rows)
+            const checkuser = await db.query("SELECT FROM Reflections WHERE id= $1 AND userid = $2", [dataId, userdata.id])
+            if (checkuser.rows.length === 0) {
+                res.status(401).json({ message: "Unauthorized" })
+            } else {
+                const { success, low_point, take_away } = req.body
+                const data = await db.query("UPDATE Reflections SET success = $1, low_point = $2, take_away = $3 WHERE id = $4 AND userid = $5 RETURNING *", [success, low_point, take_away, dataId, userdata.id])
+                res.status(200).json(data.rows)
+            }
         } catch (error) {
             res.status(error.code || 500).json({ message: error.message })
         }
@@ -58,22 +63,23 @@ class reflectionController {
     }
 
     static async deleteReflectionById(req, res) {
+        const dataId = req.params.id
+        const userdata = req.UserData
         try {
-            const dataId = req.params.id
-            const userdata = req.UserData
-            const data = await db.query("DELETE FROM Reflections WHERE id= $1 AND userid = $2", [dataId, userdata.id])
-            if (!data) {
-                throw {
-                    code: 404,
-                    message: "Data not found"
-                }
+            const checkuser = await db.query("SELECT FROM Reflections WHERE id= $1 AND userid = $2", [dataId, userdata.id])
+            if (checkuser.rows.length === 0) {
+                res.status(401).json({ message: "Unauthorized" })
+            } else {
+                await db.query("DELETE FROM Reflections WHERE id= $1", [dataId])
+                res.status(200).json({ message: "Success Deleted" })
             }
-            res.status(200).json({ message: "Success Deleted" })
+
         } catch (error) {
             res.status(error.code || 500).json({ message: error.message })
 
         }
     }
 }
+
 
 module.exports = reflectionController
