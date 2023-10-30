@@ -9,8 +9,8 @@ class userController {
     static async register(req, res) {
 
         try {
-            const existisngUser = await db.query("SELECT * FROM Users WHERE email = $1", [req.body.email])
-            if (existisngUser.rowCount > 0) {
+            const existingUser = await db.query("SELECT * FROM Users WHERE email = $1", [req.body.email])
+            if (existingUser.rowCount > 0) {
                 throw {
                     code: 400,
                     message: "Email already used!"

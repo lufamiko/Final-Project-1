@@ -1,0 +1,9 @@
+CREATE TABLE Reflections (
+    id SERIAL PRIMARY KEY,
+    success VARCHAR(255),
+    low_point VARCHAR(255),
+    take_away TEXT,
+	userid INTEGER REFERENCES users(id),
+    createdat TIMESTAMPTZ DEFAULT NOW(),
+    updatedat TIMESTAMPTZ DEFAULT NOW()
+);
